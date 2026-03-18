@@ -17,41 +17,41 @@
 <body>
     <h1>สรุปคำสั่งซื้อ</h1>
 
-    <!-- Pokémon info -->
-    <img src="{{ url_for('static', filename='images/' + data.image) }}" alt="{{ name }}">
-    <p>โปเกมอน: {{ name }}</p>
-    <p>HP: {{ data.hp }}</p>
-    <p>Damage: {{ data.damage }}</p>
-    <p>จำนวน: {{ quantity }}</p>
-    <p>ท่าโจมตี: {{ move }}</p>
-    <p>ราคารวม: {{ total }} บาท</p>
+    <div id="receipt-container"></div>
 
-    <!-- QR Code -->
-    <h2>สแกน QR Code เพื่อชำระเงิน</h2>
-    <img src="{{ url_for('static', filename='images/pay_qr.png') }}" class="qr" alt="QR Code">
+    <script>
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
+    const hp = params.get("hp");
+    const damage = params.get("damage");
+    const quantity = params.get("quantity");
+    const move = params.get("move");
+    const total = params.get("total");
+    const image = params.get("image");
 
-    <!-- WhatsApp Contact -->
-    <div class="contact">
-        <h2>ติดต่อสอบถามเพิ่มเติม</h2>
-        <a href="https://api.whatsapp.com/send/?phone=660828150927&text=สนใจสินค้า" target="_blank">
-            <img src="{{ url_for('static', filename='images/whatsapp.png') }}" alt="ติดต่อ WhatsApp" class="whatsapp-img">
-            <p>คลิกเพื่อแชทผ่าน WhatsApp</p>
-        </a>
-    </div>
+    const container = document.getElementById("receipt-container");
+    container.innerHTML = `
+        <img src="images/${image}" alt="${name}">
+        <p>โปเกมอน: ${name}</p>
+        <p>HP: ${hp}</p>
+        <p>Damage: ${damage}</p>
+        <p>จำนวน: ${quantity}</p>
+        <p>ท่าโจมตี: ${move}</p>
+        <p>ราคารวม: ${total} บาท</p>
 
-    <a href="/">กลับไปซื้อเพิ่ม</a>
+        <h2>สแกน QR Code เพื่อชำระเงิน</h2>
+        <img src="images/pay_qr.png" class="qr">
 
-    <!-- Live Chat Widget -->
-    <script type="text/javascript">
-    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-    (function(){
-        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-        s1.async=true;
-        s1.src='https://embed.tawk.to/YOUR_PROPERTY_ID/default';
-        s1.charset='UTF-8';
-        s1.setAttribute('crossorigin','*');
-        s0.parentNode.insertBefore(s1,s0);
-    })();
+        <div class="contact">
+            <h2>ติดต่อสอบถามเพิ่มเติม</h2>
+            <a href="https://api.whatsapp.com/send/?phone=660828150927&text=สนใจสินค้า" target="_blank">
+                <img src="images/whatsapp.png" class="whatsapp-img">
+                <p>คลิกเพื่อแชทผ่าน WhatsApp</p>
+            </a>
+        </div>
+
+        <a href="index.html">กลับไปซื้อเพิ่ม</a>
+    `;
     </script>
 </body>
 </html>
