@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ใบเสร็จ Pokemonshell</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1, h2 { color: #ff5555; }
+        p { font-size: 18px; }
+        img { width: 150px; }
+        a { color: #ff5555; text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; }
+        .qr { width: 200px; margin-top: 20px; }
+        .contact { text-align: center; margin-top: 20px; }
+        .whatsapp-img { width: 100px; }
+    </style>
+</head>
+<body>
+    <h1>สรุปคำสั่งซื้อ</h1>
+
+    <!-- Pokémon info -->
+    <img src="{{ url_for('static', filename='images/' + data.image) }}" alt="{{ name }}">
+    <p>โปเกมอน: {{ name }}</p>
+    <p>HP: {{ data.hp }}</p>
+    <p>Damage: {{ data.damage }}</p>
+    <p>จำนวน: {{ quantity }}</p>
+    <p>ท่าโจมตี: {{ move }}</p>
+    <p>ราคารวม: {{ total }} บาท</p>
+
+    <!-- QR Code -->
+    <h2>สแกน QR Code เพื่อชำระเงิน</h2>
+    <img src="{{ url_for('static', filename='images/pay_qr.png') }}" class="qr" alt="QR Code">
+
+    <!-- WhatsApp Contact -->
+    <div class="contact">
+        <h2>ติดต่อสอบถามเพิ่มเติม</h2>
+        <a href="https://api.whatsapp.com/send/?phone=660828150927&text=สนใจสินค้า" target="_blank">
+            <img src="{{ url_for('static', filename='images/whatsapp.png') }}" alt="ติดต่อ WhatsApp" class="whatsapp-img">
+            <p>คลิกเพื่อแชทผ่าน WhatsApp</p>
+        </a>
+    </div>
+
+    <a href="/">กลับไปซื้อเพิ่ม</a>
+
+    <!-- Live Chat Widget -->
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+        s1.async=true;
+        s1.src='https://embed.tawk.to/YOUR_PROPERTY_ID/default';
+        s1.charset='UTF-8';
+        s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pokemonshell</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #ff5555; }
+        .pokemon-card { display: inline-block; border: 1px solid #ccc; padding: 10px; margin: 10px; text-align: center; width: 200px; }
+        .pokemon-card img { width: 150px; }
+        select, input { width: 100%; padding: 5px; margin-top: 5px; }
+        button { background-color: #ff5555; color: white; padding: 10px; border: none; cursor: pointer; margin-top: 10px; width: 100%; }
+        button:hover { background-color: #ff0000; }
+    </style>
+</head>
+<body>
+    <h1>ร้าน Pokemonshell</h1>
+
+    {% for name, info in pokemons.items() %}
+    <form method="post">
+        <div class="pokemon-card">
+            <img src="{{ url_for('static', filename='images/' + info.image) }}" alt="{{ name }}">
+            <h3>{{ name }}</h3>
+
+            <label>HP:</label>
+            <input type="number" name="hp" value="{{ info.hp }}" min="1">
+
+            <label>Damage:</label>
+            <input type="number" name="damage" value="{{ info.damage }}" min="1">
+
+            <p>ราคา: {{ info.price }} บาท</p>
+
+            <label>จำนวน:</label>
+            <input type="number" name="quantity" value="1" min="1">
+
+            <label>ท่าโจมตี:</label>
+            <select name="move">
+                {% for move in info.moves %}
+                <option>{{ move }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="hidden" name="pokemon" value="{{ name }}">
+            <button type="submit">ซื้อ {{ name }}</button>
+        </div>
+    </form>
+    {% endfor %}
+
+</body>
+</html>
