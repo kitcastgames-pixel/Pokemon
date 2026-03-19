@@ -6,7 +6,7 @@
 <title>Pokemonshell Shop</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     margin: 0;
     background: #f5f5f5;
   }
@@ -16,11 +16,17 @@
     padding: 15px;
     text-align: center;
     font-size: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
   .search-box {
     padding: 15px;
     text-align: center;
     background: white;
+    position: sticky;
+    top: 56px;
+    z-index: 9;
   }
   .search-box input {
     width: 90%;
@@ -31,15 +37,18 @@
   }
   .container {
     display: flex;
+    flex-wrap: wrap;
   }
   #pokemon-container {
     flex: 3;
     padding: 20px;
+    max-height: 75vh;
     overflow-y: auto;
-    max-height: 80vh;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   .pokemon-card {
-    display: inline-block;
     background: white;
     border-radius: 15px;
     padding: 10px;
@@ -72,15 +81,39 @@
     background: white;
     padding: 20px;
     border-left: 2px solid #eee;
-    max-height: 80vh;
+    max-height: 75vh;
     overflow-y: auto;
+    min-width: 280px;
   }
   .checkout {
     background: green;
     margin-top: 10px;
   }
   #cart-items div {
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #cart-items button {
+    background: #ff5555;
+    border: none;
+    padding: 3px 7px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  @media (max-width: 800px) {
+    .container {
+      flex-direction: column;
+    }
+    #pokemon-container, .cart {
+      max-height: none;
+      width: 100%;
+      border-left: none;
+      padding: 10px;
+      min-width: auto;
+    }
   }
 </style>
 </head>
@@ -113,46 +146,50 @@
   const container = document.getElementById("pokemon-container");
   const cartItems = document.getElementById("cart-items");
   const totalEl = document.getElementById("total");
+  const searchInput = document.getElementById("search");
 
-  let cart = [];
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
   let allPokemons = [];
+  let filteredPokemons = [];
+  let loadedCount = 0;
+  const loadStep = 50;
+  const maxLoad = 1000; // โหลดสูงสุด 1000 ตัว
 
-  // สร้างราคาสุ่ม (หรือคำนวณเองได้)
   function getPrice(id) {
     return id * 5 + Math.floor(Math.random() * 100);
   }
-
-  // ลิงก์รูปภาพที่ดีที่สุด + fallback
   function getImage(id) {
     return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+  }
+  function capitalize(s) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
   async function loadPokemons() {
     try {
-      const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=150");
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${maxLoad}`);
       const data = await res.json();
 
       allPokemons = data.results.map((p, i) => ({
         name: capitalize(p.name),
         id: i + 1,
         price: getPrice(i + 1),
-        image: getImage(i + 1)
+        image: getImage(i + 1),
       }));
 
-      renderPokemons(allPokemons);
+      filteredPokemons = allPokemons;
+      loadedCount = 0;
+      container.innerHTML = "";
+      loadMorePokemons();
     } catch (err) {
       container.innerHTML = "เกิดข้อผิดพลาดในการโหลด Pokémon";
       console.error(err);
     }
   }
 
-  function renderPokemons(list) {
-    container.innerHTML = "";
-    if (list.length === 0) {
-      container.innerHTML = "<p>ไม่พบ Pokémon ที่ค้นหา</p>";
-      return;
-    }
-    list.forEach(pokemon => {
+  function loadMorePokemons() {
+    const nextPokemons = filteredPokemons.slice(loadedCount, loadedCount + loadStep);
+    nextPokemons.forEach(pokemon => {
       const card = document.createElement("div");
       card.className = "pokemon-card";
       card.innerHTML = `
@@ -163,32 +200,90 @@
           onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png';"
         />
         <p>💰 ราคา: ${pokemon.price} บาท</p>
-        <button onclick="addToCart('${pokemon.name}', ${pokemon.price})">ซื้อ</button>
+        <button onclick="addToCart('${pokemon.name}', ${pokemon.price}, ${pokemon.id})">ซื้อ</button>
       `;
       container.appendChild(card);
     });
+    loadedCount += loadStep;
+  }
+
+  container.addEventListener("scroll", () => {
+    if (container.scrollTop + container.clientHeight >= container.scrollHeight - 10) {
+      if (loadedCount < filteredPokemons.length) {
+        loadMorePokemons();
+      }
+    }
+  });
+
+  function renderPokemons(list) {
+    container.innerHTML = "";
+    loadedCount = 0;
+    filteredPokemons = list;
+    loadMorePokemons();
   }
 
   function searchPokemon() {
-    const keyword = document.getElementById("search").value.toLowerCase();
-    const filtered = allPokemons.filter(p =>
-      p.name.toLowerCase().includes(keyword)
-    );
+    const keyword = searchInput.value.toLowerCase();
+    const filtered = allPokemons.filter(p => p.name.toLowerCase().includes(keyword));
     renderPokemons(filtered);
   }
 
-  function addToCart(name, price) {
-    cart.push({ name, price });
+  function saveCart() {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
+
+  function addToCart(name, price, id) {
+    const index = cart.findIndex(item => item.id === id);
+    if (index > -1) {
+      cart[index].quantity++;
+    } else {
+      cart.push({ name, price, id, quantity: 1 });
+    }
+    saveCart();
     renderCart();
+  }
+
+  function removeFromCart(id) {
+    const index = cart.findIndex(item => item.id === id);
+    if (index > -1) {
+      cart.splice(index, 1);
+      saveCart();
+      renderCart();
+    }
+  }
+
+  function updateQuantity(id, delta) {
+    const index = cart.findIndex(item => item.id === id);
+    if (index > -1) {
+      cart[index].quantity += delta;
+      if (cart[index].quantity <= 0) {
+        removeFromCart(id);
+      } else {
+        saveCart();
+        renderCart();
+      }
+    }
   }
 
   function renderCart() {
     cartItems.innerHTML = "";
+    if (cart.length === 0) {
+      cartItems.innerHTML = "<p>ตะกร้าว่าง</p>";
+      totalEl.innerText = "รวม: 0 บาท";
+      return;
+    }
     let total = 0;
-    cart.forEach((item, i) => {
-      total += item.price;
+    cart.forEach(item => {
+      total += item.price * item.quantity;
       const div = document.createElement("div");
-      div.innerText = `${item.name} - ${item.price} บาท`;
+      div.innerHTML = `
+        <span>${item.name} x${item.quantity} = ${item.price * item.quantity} บาท</span>
+        <div>
+          <button onclick="updateQuantity(${item.id}, -1)">-</button>
+          <button onclick="updateQuantity(${item.id}, 1)">+</button>
+          <button onclick="removeFromCart(${item.id})">ลบ</button>
+        </div>
+      `;
       cartItems.appendChild(div);
     });
     totalEl.innerText = `รวม: ${total} บาท`;
@@ -199,16 +294,13 @@
       alert("ตะกร้าว่าง!");
       return;
     }
-    alert(`ขอบคุณสำหรับการสั่งซื้อ!\nรวมทั้งสิ้น: ${cart.reduce((a,b)=>a+b.price,0)} บาท`);
-    cart = [];
-    renderCart();
+    localStorage.setItem("cartForReceipt", JSON.stringify(cart));
+    window.location.href = "receipt.html";
   }
 
-  function capitalize(s) {
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  }
-
+  // เริ่มต้น
   loadPokemons();
+  renderCart();
 </script>
 </body>
 </html>
