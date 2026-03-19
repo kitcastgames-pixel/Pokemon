@@ -1,57 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-    <title>ใบเสร็จ Pokemonshell</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        h1, h2 { color: #ff5555; }
-        p { font-size: 18px; }
-        img { width: 150px; }
-        a { color: #ff5555; text-decoration: none; font-weight: bold; }
-        a:hover { text-decoration: underline; }
-        .qr { width: 200px; margin-top: 20px; }
-        .contact { text-align: center; margin-top: 20px; }
-        .whatsapp-img { width: 100px; }
-    </style>
+<meta charset="UTF-8">
+<title>ใบเสร็จ</title>
 </head>
+
 <body>
-    <h1>สรุปคำสั่งซื้อ</h1>
 
-    <div id="receipt-container"></div>
+<h1>🧾 ใบเสร็จ</h1>
+<div id="receipt"></div>
 
-    <script>
-    const params = new URLSearchParams(window.location.search);
-    const name = params.get("name");
-    const hp = params.get("hp");
-    const damage = params.get("damage");
-    const quantity = params.get("quantity");
-    const move = params.get("move");
-    const total = params.get("total");
-    const image = params.get("image");
+<script>
+const receiptDiv = document.getElementById("receipt");
+const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    const container = document.getElementById("receipt-container");
-    container.innerHTML = `
-        <img src="images/${image}" alt="${name}">
-        <p>โปเกมอน: ${name}</p>
-        <p>HP: ${hp}</p>
-        <p>Damage: ${damage}</p>
-        <p>จำนวน: ${quantity}</p>
-        <p>ท่าโจมตี: ${move}</p>
-        <p>ราคารวม: ${total} บาท</p>
+let total = 0;
 
-        <h2>สแกน QR Code เพื่อชำระเงิน</h2>
-        <img src="images/pay_qr.png" class="qr">
+cart.forEach(item => {
+    total += item.price;
+    const p = document.createElement("p");
+    p.innerText = `${item.name} - ${item.price} บาท`;
+    receiptDiv.appendChild(p);
+});
 
-        <div class="contact">
-            <h2>ติดต่อสอบถามเพิ่มเติม</h2>
-            <a href="https://api.whatsapp.com/send/?phone=660828150927&text=สนใจสินค้า" target="_blank">
-                <img src="images/whatsapp.png" class="whatsapp-img">
-                <p>คลิกเพื่อแชทผ่าน WhatsApp</p>
-            </a>
-        </div>
+const totalEl = document.createElement("h2");
+totalEl.innerText = `รวมทั้งหมด: ${total} บาท`;
+receiptDiv.appendChild(totalEl);
+</script>
 
-        <a href="index.html">กลับไปซื้อเพิ่ม</a>
-    `;
-    </script>
 </body>
 </html>
