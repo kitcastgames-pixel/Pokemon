@@ -1,54 +1,44 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Pokemonshell Shop</title>
-
 <style>
-body {
-    font-family: Arial;
+  body {
+    font-family: Arial, sans-serif;
     margin: 0;
     background: #f5f5f5;
-}
-
-/* HEADER */
-.header {
+  }
+  .header {
     background: #ff5555;
     color: white;
     padding: 15px;
     text-align: center;
     font-size: 24px;
-}
-
-/* SEARCH */
-.search-box {
+  }
+  .search-box {
     padding: 15px;
     text-align: center;
     background: white;
-}
-
-.search-box input {
+  }
+  .search-box input {
     width: 90%;
     padding: 12px;
     border-radius: 10px;
     border: 1px solid #ccc;
     font-size: 16px;
-}
-
-/* LAYOUT */
-.container {
+  }
+  .container {
     display: flex;
-}
-
-/* POKEMON LIST */
-#pokemon-container {
+  }
+  #pokemon-container {
     flex: 3;
     padding: 20px;
-}
-
-/* CARD */
-.pokemon-card {
+    overflow-y: auto;
+    max-height: 80vh;
+  }
+  .pokemon-card {
     display: inline-block;
     background: white;
     border-radius: 15px;
@@ -57,21 +47,18 @@ body {
     width: 160px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.pokemon-card img {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
     transition: transform 0.3s;
-}
-
-.pokemon-card:hover img {
-    transform: scale(1.2);
-}
-
-/* BUTTON */
-button {
+  }
+  .pokemon-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  .pokemon-card img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+  }
+  button {
     background: #ff5555;
     color: white;
     border: none;
@@ -79,51 +66,149 @@ button {
     width: 100%;
     border-radius: 8px;
     cursor: pointer;
-}
-
-/* CART */
-.cart {
+  }
+  .cart {
     flex: 1;
     background: white;
     padding: 20px;
     border-left: 2px solid #eee;
-}
-
-.checkout {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .checkout {
     background: green;
     margin-top: 10px;
-}
+  }
+  #cart-items div {
+    margin-bottom: 6px;
+  }
 </style>
 </head>
-
 <body>
 
 <div class="header">🛒 Pokemonshell Shop</div>
 
-<!-- 🔍 SEARCH -->
 <div class="search-box">
-    <input 
-        type="text" 
-        id="search" 
-        placeholder="🔍 ค้นหา Pokémon..."
-        onkeyup="searchPokemon()"
-    >
+  <input
+    type="text"
+    id="search"
+    placeholder="🔍 ค้นหา Pokémon..."
+    onkeyup="searchPokemon()"
+    autocomplete="off"
+  />
 </div>
 
-<!-- 🖼️ LIST ด้านล่าง -->
 <div class="container">
+  <div id="pokemon-container">กำลังโหลด Pokémon...</div>
 
-    <div id="pokemon-container"></div>
-
-    <div class="cart">
-        <h2>ตะกร้า</h2>
-        <div id="cart-items"></div>
-        <h3 id="total">รวม: 0 บาท</h3>
-        <button class="checkout" onclick="checkout()">Checkout</button>
-    </div>
-
+  <div class="cart">
+    <h2>ตะกร้า</h2>
+    <div id="cart-items"></div>
+    <h3 id="total">รวม: 0 บาท</h3>
+    <button class="checkout" onclick="checkout()">Checkout</button>
+  </div>
 </div>
 
-<script src="js/main.js"></script>
+<script>
+  const container = document.getElementById("pokemon-container");
+  const cartItems = document.getElementById("cart-items");
+  const totalEl = document.getElementById("total");
+
+  let cart = [];
+  let allPokemons = [];
+
+  // สร้างราคาสุ่ม (หรือคำนวณเองได้)
+  function getPrice(id) {
+    return id * 5 + Math.floor(Math.random() * 100);
+  }
+
+  // ลิงก์รูปภาพที่ดีที่สุด + fallback
+  function getImage(id) {
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+  }
+
+  async function loadPokemons() {
+    try {
+      const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=150");
+      const data = await res.json();
+
+      allPokemons = data.results.map((p, i) => ({
+        name: capitalize(p.name),
+        id: i + 1,
+        price: getPrice(i + 1),
+        image: getImage(i + 1)
+      }));
+
+      renderPokemons(allPokemons);
+    } catch (err) {
+      container.innerHTML = "เกิดข้อผิดพลาดในการโหลด Pokémon";
+      console.error(err);
+    }
+  }
+
+  function renderPokemons(list) {
+    container.innerHTML = "";
+    if (list.length === 0) {
+      container.innerHTML = "<p>ไม่พบ Pokémon ที่ค้นหา</p>";
+      return;
+    }
+    list.forEach(pokemon => {
+      const card = document.createElement("div");
+      card.className = "pokemon-card";
+      card.innerHTML = `
+        <h3>${pokemon.name}</h3>
+        <img
+          src="${pokemon.image}"
+          alt="${pokemon.name}"
+          onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png';"
+        />
+        <p>💰 ราคา: ${pokemon.price} บาท</p>
+        <button onclick="addToCart('${pokemon.name}', ${pokemon.price})">ซื้อ</button>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function searchPokemon() {
+    const keyword = document.getElementById("search").value.toLowerCase();
+    const filtered = allPokemons.filter(p =>
+      p.name.toLowerCase().includes(keyword)
+    );
+    renderPokemons(filtered);
+  }
+
+  function addToCart(name, price) {
+    cart.push({ name, price });
+    renderCart();
+  }
+
+  function renderCart() {
+    cartItems.innerHTML = "";
+    let total = 0;
+    cart.forEach((item, i) => {
+      total += item.price;
+      const div = document.createElement("div");
+      div.innerText = `${item.name} - ${item.price} บาท`;
+      cartItems.appendChild(div);
+    });
+    totalEl.innerText = `รวม: ${total} บาท`;
+  }
+
+  function checkout() {
+    if (cart.length === 0) {
+      alert("ตะกร้าว่าง!");
+      return;
+    }
+    alert(`ขอบคุณสำหรับการสั่งซื้อ!\nรวมทั้งสิ้น: ${cart.reduce((a,b)=>a+b.price,0)} บาท`);
+    cart = [];
+    renderCart();
+  }
+
+  function capitalize(s) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  loadPokemons();
+</script>
 </body>
 </html>
