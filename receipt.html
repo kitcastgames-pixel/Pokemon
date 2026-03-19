@@ -1,32 +1,85 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>ใบเสร็จ</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ใบเสร็จ Pokemonshell Shop</title>
+<style>
+  body {
+    font-family: Arial;
+    margin: 20px;
+    background: #f5f5f5;
+  }
+  h1 {
+    color: #ff5555;
+    text-align: center;
+  }
+  .receipt {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 6px;
+  }
+  .total {
+    font-weight: bold;
+    font-size: 20px;
+    margin-top: 20px;
+    text-align: right;
+  }
+  button {
+    background: #ff5555;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+</style>
 </head>
-
 <body>
 
-<h1>🧾 ใบเสร็จ</h1>
-<div id="receipt"></div>
+<h1>🧾 ใบเสร็จ Pokemonshell Shop</h1>
+<div class="receipt" id="receipt"></div>
+<button onclick="goBack()">กลับไปหน้าร้าน</button>
 
 <script>
-const receiptDiv = document.getElementById("receipt");
-const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const receiptDiv = document.getElementById("receipt");
+  const cart = JSON.parse(localStorage.getItem("cartForReceipt")) || [];
 
-let total = 0;
+  if(cart.length === 0) {
+    receiptDiv.innerHTML = "<p>ไม่มีข้อมูลใบเสร็จ</p>";
+  } else {
+    let total = 0;
+    cart.forEach(item => {
+      total += item.price * item.quantity;
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <span>${item.name} x${item.quantity}</span>
+        <span>${item.price * item.quantity} บาท</span>
+      `;
+      receiptDiv.appendChild(div);
+    });
+    const totalDiv = document.createElement("div");
+    totalDiv.className = "total";
+    totalDiv.innerText = `รวมทั้งหมด: ${total} บาท`;
+    receiptDiv.appendChild(totalDiv);
+  }
 
-cart.forEach(item => {
-    total += item.price;
-    const p = document.createElement("p");
-    p.innerText = `${item.name} - ${item.price} บาท`;
-    receiptDiv.appendChild(p);
-});
-
-const totalEl = document.createElement("h2");
-totalEl.innerText = `รวมทั้งหมด: ${total} บาท`;
-receiptDiv.appendChild(totalEl);
+  function goBack() {
+    window.location.href = "index.html";
+  }
 </script>
-
 </body>
 </html>
