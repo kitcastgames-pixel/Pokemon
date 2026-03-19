@@ -103,6 +103,26 @@
     cursor: pointer;
     font-size: 14px;
   }
+  /* WhatsApp floating button */
+  #whatsapp-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #25D366;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #whatsapp-btn img {
+    width: 35px;
+    height: 35px;
+  }
   @media (max-width: 800px) {
     .container {
       flex-direction: column;
@@ -142,6 +162,16 @@
   </div>
 </div>
 
+<!-- WhatsApp floating button -->
+<a
+  href="https://api.whatsapp.com/send/?phone=660828150927&text=%E0%B8%AA%E0%B9%88%E0%B8%87%E0%B8%A3%E0%B8%B9%E0%B8%9B%E0%B8%9E%E0%B8%A3%E0%B9%89%E0%B8%AD%E0%B8%A1%E0%B8%AA%E0%B8%A5%E0%B8%B4%E0%B8%9B%E0%B9%82%E0%B8%AD%E0%B8%99%E0%B9%80%E0%B8%87%E0%B8%B4%E0%B8%99"
+  target="_blank"
+  id="whatsapp-btn"
+  title="ติดต่อผ่าน WhatsApp"
+>
+  <img src="whatsapp.png" alt="WhatsApp" />
+</a>
+
 <script>
   const container = document.getElementById("pokemon-container");
   const cartItems = document.getElementById("cart-items");
@@ -153,7 +183,7 @@
   let filteredPokemons = [];
   let loadedCount = 0;
   const loadStep = 50;
-  const maxLoad = 1000; // โหลดสูงสุด 1000 ตัว
+  const maxLoad = 1000;
 
   function getPrice(id) {
     return id * 5 + Math.floor(Math.random() * 100);
@@ -200,7 +230,7 @@
           onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png';"
         />
         <p>💰 ราคา: ${pokemon.price} บาท</p>
-        <button onclick="addToCart('${pokemon.name}', ${pokemon.price}, ${pokemon.id})">ซื้อ</button>
+        <button onclick="addToCart('${pokemon.name}', ${pokemon.price}, ${pokemon.id}, '${pokemon.image}')">ซื้อ</button>
       `;
       container.appendChild(card);
     });
@@ -232,12 +262,12 @@
     localStorage.setItem("cart", JSON.stringify(cart));
   }
 
-  function addToCart(name, price, id) {
+  function addToCart(name, price, id, image) {
     const index = cart.findIndex(item => item.id === id);
     if (index > -1) {
       cart[index].quantity++;
     } else {
-      cart.push({ name, price, id, quantity: 1 });
+      cart.push({ name, price, id, quantity: 1, image });
     }
     saveCart();
     renderCart();
@@ -298,7 +328,7 @@
     window.location.href = "receipt.html";
   }
 
-  // เริ่มต้น
+  // เริ่มโหลด
   loadPokemons();
   renderCart();
 </script>
