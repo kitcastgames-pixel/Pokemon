@@ -24,16 +24,36 @@
   }
   .item {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     border-bottom: 1px solid #eee;
     padding-bottom: 6px;
+  }
+  .item img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-right: 10px;
+    border-radius: 10px;
+    background: #f0f0f0;
+  }
+  .item-info {
+    flex: 1;
+  }
+  .item-qty-price {
+    white-space: nowrap;
   }
   .total {
     font-weight: bold;
     font-size: 20px;
     margin-top: 20px;
     text-align: right;
+  }
+  .qr-code {
+    display: block;
+    max-width: 200px;
+    margin: 20px auto 0 auto;
   }
   button {
     background: #ff5555;
@@ -51,6 +71,9 @@
 
 <h1>🧾 ใบเสร็จ Pokemonshell Shop</h1>
 <div class="receipt" id="receipt"></div>
+
+<img src="pay_qr.png" alt="Pay QR Code" class="qr-code" />
+
 <button onclick="goBack()">กลับไปหน้าร้าน</button>
 
 <script>
@@ -66,8 +89,9 @@
       const div = document.createElement("div");
       div.className = "item";
       div.innerHTML = `
-        <span>${item.name} x${item.quantity}</span>
-        <span>${item.price * item.quantity} บาท</span>
+        <img src="${item.image}" alt="${item.name}" />
+        <div class="item-info">${item.name}</div>
+        <div class="item-qty-price">${item.quantity} x ${item.price} บาท = ${item.price * item.quantity} บาท</div>
       `;
       receiptDiv.appendChild(div);
     });
