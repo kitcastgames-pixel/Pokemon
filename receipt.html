@@ -55,7 +55,7 @@
     max-width: 200px;
     margin: 20px auto 0 auto;
   }
-  button {
+  button, #whatsapp-btn {
     background: #ff5555;
     color: white;
     border: none;
@@ -64,6 +64,28 @@
     border-radius: 10px;
     cursor: pointer;
     margin-top: 15px;
+    text-align: center;
+    font-size: 16px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  #whatsapp-btn {
+    background: #25D366;
+    margin-top: 10px;
+  }
+  #whatsapp-btn img {
+    width: 24px;
+    height: 24px;
+  }
+  .whatsapp-text {
+    max-width: 600px;
+    margin: 12px auto;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
   }
 </style>
 </head>
@@ -73,6 +95,18 @@
 <div class="receipt" id="receipt"></div>
 
 <img src="pay_qr.png" alt="Pay QR Code" class="qr-code" />
+
+<div class="whatsapp-text">
+  ถ่ายรูปภาพใบเสร็จแล้วติดต่อที่นี้
+</div>
+<a
+  href="https://api.whatsapp.com/send/?phone=660828150927&text=%E0%B8%AA%E0%B9%88%E0%B8%87%E0%B8%A3%E0%B8%B9%E0%B8%9B%E0%B8%9E%E0%B8%A3%E0%B9%89%E0%B8%AD%E0%B8%A1%E0%B8%AA%E0%B8%A5%E0%B8%B4%E0%B8%9B%E0%B9%82%E0%B8%AD%E0%B8%99%E0%B9%80%E0%B8%87%E0%B8%B4%E0%B8%99"
+  target="_blank"
+  id="whatsapp-btn"
+  title="ติดต่อผ่าน WhatsApp"
+>
+  <img src="whatsapp.png" alt="WhatsApp" /> ติดต่อผ่าน WhatsApp
+</a>
 
 <button onclick="goBack()">กลับไปหน้าร้าน</button>
 
